@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>权限管理</h1>
+        <h1>节点管理其他</h1>
     </div>
 </template>
 

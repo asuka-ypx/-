@@ -47,10 +47,19 @@ import { useRouter } from 'vue-router';
 defineProps(['menuList'])
 
 let $router = useRouter();
-const goRoute = (vc: any) => {
-    //路由跳转
+// const goRoute = (vc: any) => {
+//     //路由跳转
+//     $router.push(vc.index);
+// }
+const goRoute = (vc: { index?: string }) => {
+  // 确保vc.index存在且为字符串
+  if (vc?.index) {
     $router.push(vc.index);
-}
+  } else {
+    console.warn("无效的路由目标：", vc);
+  }
+};
+
 </script>
 <script lang="ts">
 export default {

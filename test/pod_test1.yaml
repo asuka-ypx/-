@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+  namespace: default
+spec:
+  nodeName: test # 指定 Pod 运行的节点名称
+  containers:
+    - name: app-container
+      image: nginx:latest
+      resources:
+        requests:
+          cpu: "500m" # 请求 500 毫核 CPU
+          memory: "256Mi" # 请求 256 MiB 内存
+          nvidia.com/gpu: "1" # 请求 1 个 GPU（可选）
+        limits:
+          cpu: "1" # 限制 1 核 CPU
+          memory: "512Mi" # 限制 512 MiB 内存
+          nvidia.com/gpu: "1" # 限制 1 个 GPU（可选）
+      ports:
+        - containerPort: 80
+    - name: sidecar-container
+      image: busybox:latest
+      command: ["sh", "-c", "echo Hello Kubernetes! && sleep 3600"]
+      resources:
+        requests:
+          cpu: "200m" # 请求 200 毫核 CPU
+          memory: "128Mi" # 请求 128 MiB 内存
+        limits:
+          cpu: "500m" # 限制 500 毫核 CPU
+          memory: "256Mi" # 限制 256 MiB 内存
+  restartPolicy: Always

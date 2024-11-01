@@ -41,7 +41,6 @@ router.beforeEach(async (to, from, next) => {
             next({ path: '/login' });
         }
     }
-    next();
     // 访问某一个路由之前守卫
 
 })

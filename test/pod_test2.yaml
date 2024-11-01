@@ -1,0 +1,21 @@
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-web-pod
+  namespace: default
+spec:
+  nodeName: test  # 指定运行节点
+  containers:
+    - name: web-container
+      image: httpd:2.4
+      resources:
+        requests:
+          cpu: "250m"      # 请求 250 毫核 CPU
+          memory: "128Mi"  # 请求 128 MiB 内存
+        limits:
+          cpu: "500m"      # 限制 500 毫核 CPU
+          memory: "256Mi"  # 限制 256 MiB 内存
+      ports:
+        - containerPort: 80
+  restartPolicy: Always

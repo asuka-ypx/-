@@ -9,26 +9,9 @@
             <el-table-column align="right">
                 <template #header>
                     <el-button plain @click="open">添加节点</el-button>
-                    <el-dialog title="输入请求信息" v-model="showRequestForm">
-                        <el-form :model="requestParams">
-                            <el-form-item label="节点名称">
-                                <el-input v-model="requestParams.nodename" />
-                            </el-form-item>
-                            <el-form-item label="节点类型">
-                                <el-input v-model="requestParams.nodeType" />
-                            </el-form-item>
-                            <!-- 其他必要的输入项 -->
-                        </el-form>
-                        <template #footer>
-                            <el-button @click="showRequestForm = false">取消</el-button>
-                            <el-button type="primary" @click="fetchNodeInfo">确定</el-button>
-                        </template>
-                    </el-dialog>
+
                 </template>
                 <template #default="scope">
-                    <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-                        Edit
-                    </el-button>
                     <el-button size="small" type="danger" @click="handleDelete(scope.row)">
                         Delete
                     </el-button>

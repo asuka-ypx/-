@@ -52,7 +52,7 @@ export const constantRoute = [
             hidden: false,
             icon: 'Location'
         },
-        redirect:'/node/info',
+        redirect: '/node/info',
         children: [
             {
                 path: '/node/info',
@@ -129,7 +129,29 @@ export const constantRoute = [
                     icon: 'Grid'
                 }
             },
-            
+
+        ]
+    },
+    {
+        path: '/dispatch',
+        component: () => import('../layout/index_layout.vue'),
+        meta: {
+            title: '调度管理',
+            hidden: false,
+            icon: 'Operation'
+        },
+        redirect:'/dispatch/operation',
+        children: [
+            {
+                path: '/dispatch/operation',
+                component: () => import('../views/dispatch/index_dispatch.vue'),
+                name: 'Dispatch',
+                meta: {
+                    title: '调度管理',
+                    hidden: false,
+                    icon: 'Operation'
+                }
+            }
         ]
     },
 
