@@ -1,13 +1,15 @@
 // store/nodeStore.ts
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
-
+import { PodData } from './podStore';
 export interface NodeData {
   nodename: string;
   nodeID: string;
   nodestatus: string;
   cpu: string;
   memory: string;
+  gpu: string;
+  pods?: PodData[];
   conditions: string;
   description?: string;
 }

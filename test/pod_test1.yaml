@@ -4,7 +4,6 @@ metadata:
   name: test-pod
   namespace: default
 spec:
-  nodeName: test # 指定 Pod 运行的节点名称
   containers:
     - name: app-container
       image: nginx:latest
@@ -19,6 +18,7 @@ spec:
           nvidia.com/gpu: "1" # 限制 1 个 GPU（可选）
       ports:
         - containerPort: 80
+        
     - name: sidecar-container
       image: busybox:latest
       command: ["sh", "-c", "echo Hello Kubernetes! && sleep 3600"]

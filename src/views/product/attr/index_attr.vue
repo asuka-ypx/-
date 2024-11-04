@@ -2,7 +2,7 @@
   <el-card>
     <el-table :data="pods" style="width: 100%" shadow="hover">
       <el-table-column label="Pod名称" prop="metadata.name" />
-      <el-table-column label="Pod UID" prop="metadata.uid" />
+      <el-table-column label="Pod所属节点" prop="spec.nodename" />
       <el-table-column label="命名空间" prop="metadata.namespace" />
       <el-table-column label="容器列表">
         <template #default="scope">
@@ -31,6 +31,10 @@
             </template>
           </el-dialog>
         </template>
+        <template #footer>
+
+        </template>
+
         <template #default="scope">
           <el-button size="small" type="danger" @click="handleDelete(scope.row)">
             删除
@@ -38,6 +42,17 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-upload class="upload-demo" drag action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" multiple>
+      <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+      <div class="el-upload__text">
+        Drop file here or <em>click to upload</em>
+      </div>
+      <template #tip>
+        <div class="el-upload__tip">
+          YAML files with a size less than 500kb
+        </div>
+      </template>
+    </el-upload>
   </el-card>
 </template>
 
@@ -47,7 +62,7 @@ import YAML from 'js-yaml';
 import { usePodStore } from '../../../store/medules/podStore';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import axios from 'axios';
-
+import { UploadFilled } from '@element-plus/icons-vue'
 // 控制对话框显示
 const formLabelWidth = '140px';
 const open = ref(false);
@@ -71,7 +86,7 @@ const confirm = async () => {
   try {
     // 将 YAML 字符串解析为对象
     const parsedData = YAML.load(form.yamlContent);
-    
+
     // 检查是否存在 status 字段
     if (!parsedData.status) {
       parsedData.status = { phase: 'Pending' }; // 设置默认状态
@@ -88,7 +103,7 @@ const confirm = async () => {
       ElMessage.error('Pod 添加失败');
     }
   } catch (error) {
-    ElMessage.error('请输入正确的 YAML 格式');
+    ElMessage.error('错误');
     console.error('发送请求时出错', error);
   }
 };

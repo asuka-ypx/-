@@ -1,26 +1,17 @@
 <template>
   <el-card body-class="background">
     <!-- 容器启动情况卡片 -->
-    <el-card shadow="hover" class="cpu">
+    <el-card shadow="hover" class="cpu" style="margin: 10px;">
       <template #header>
         <div class="card-header">
-          <span>容器启动情况</span>
-          <el-dropdown style="float: right;">
-            <span class="el-dropdown-link">
-              切换节点
-              <el-icon class="el-icon--right">
-                <arrow-down />
-              </el-icon>
-            </span>
-            <template #dropdown>
-              <el-dropdown-item v-for="(node, index) in nodeStore.nodes" :key="index" @click="change(node)">
-                {{ node.nodename }}
-              </el-dropdown-item>
-            </template>
-          </el-dropdown>
+          <span>CPU使用率</span>
+
         </div>
       </template>
+
       <el-progress type="circle" :percentage="calculateCpuUsage()" />
+      <!-- <el-progress type="circle" :percentage="calculateMemoryUsage()" /> -->
+
       <el-dropdown style="float: right;">
         <span class="el-dropdown-link">
           切换 Pod
@@ -29,12 +20,13 @@
           </el-icon>
         </span>
         <template #dropdown>
-          <el-dropdown-item v-for="(pod, index) in filteredPods" :key="index" @click="changepod(pod)">
+          <el-dropdown-item v-for="(pod, index) in podStore.pods" :key="index" @click="changepod(pod)">
             {{ pod.metadata.name }}
           </el-dropdown-item>
         </template>
       </el-dropdown>
-      <el-descriptions :title="cpuInfo?.nodename" border>
+
+      <el-descriptions :title="podInfo?.metadata.name" border>
         <el-descriptions-item label="Pod Name">
           {{ podInfo?.metadata.name }}
         </el-descriptions-item>
@@ -78,7 +70,7 @@
     </el-card>
 
     <!-- 其他信息卡片 -->
-    <el-card shadow="hover" class="memory">
+    <el-card shadow="hover" class="memory" style="margin: 10px;">
       <template #header>
         <div class="card-header">
           <span>Pod 资源使用情况</span>
@@ -90,14 +82,13 @@
               </el-icon>
             </span>
             <template #dropdown>
-              <el-dropdown-item v-for="(pod, index) in filteredPods" :key="index" @click="changepod(pod)">
+              <el-dropdown-item v-for="(pod, index) in podStore.pods" :key="index" @click="changepod(pod)">
                 {{ pod.metadata.name }}
               </el-dropdown-item>
             </template>
           </el-dropdown>
         </div>
       </template>
-      <el-progress type="circle" :percentage="calculateMemoryUsage()" />
       <el-descriptions :title="podInfo?.metadata.name" border>
         <el-descriptions-item label="Total CPU Requests">
           {{ totalCpuRequests }} m
@@ -118,7 +109,7 @@
     </el-card>
 
     <!-- 节点表格 -->
-    <el-card style="width: 100%; padding: 10px" height="350" class="node">
+    <el-card style=" margin: 10px;" height="350" class="node">
       <!-- 表格数据源改为 podStore.pods，展示所有 Pods -->
       <el-table :data="podStore.pods" height="250" style="width: 100%">
         <el-table-column prop="metadata.name" label="Pod 名称" width="180" />
@@ -153,41 +144,42 @@ const nodeStore = useNodeStore();
 const podStore = usePodStore();
 
 // 初始化 cpuInfo，默认选择第一个节点
-const cpuInfo = ref<NodeData | null>(
-  nodeStore.nodes.length > 0 ? nodeStore.nodes[0] : null
-);
+const cpuInfo = ref<NodeData | null>(null);
 
 // 初始化 podInfo
 const podInfo = ref<PodData | null>(null);
 
-// 根据选定节点过滤对应的 Pods
-const filteredPods = computed(() => {
-  if (cpuInfo.value) {
-    return podStore.pods.filter(
-      // 使用 pod.spec.nodeName 进行过滤
-      (pod) => pod.spec.nodeName === cpuInfo.value?.nodename
-    );
-  }
-  return [];
-});
+// // 根据选定节点过滤对应的 Pods
+// const filteredPods = computed(() => {
+//   if (cpuInfo.value) {
+//     return podStore.pods.filter(
+//       // 使用 pod.spec.nodeName 进行过滤
+//       (pod) => pod.spec.nodeName === cpuInfo.value?.nodename
+//     );
+//   }
+//   return [];
+// });
 
 // 当 filteredPods 或 cpuInfo 变化时，更新 podInfo
-watch(
-  [filteredPods, cpuInfo],
-  () => {
-    if (filteredPods.value.length > 0) {
-      podInfo.value = filteredPods.value[0];
-    } else {
-      podInfo.value = null;
-    }
-  },
-  { immediate: true }
-);
+// watch(
+//   [filteredPods, cpuInfo],
+//   () => {
+//     if (filteredPods.value.length > 0) {
+//       podInfo.value = filteredPods.value[0];
+//     } else {
+//       podInfo.value = null;
+//     }
+//   },
+//   { immediate: true }
+// );
 
-// 切换节点
-const change = (node: NodeData) => {
-  cpuInfo.value = node;
-};
+// 默认选择第一个 Pod
+watch(() => podStore.pods, (pods) => {
+  if (pods.length > 0) {
+    podInfo.value = pods[0];
+  }
+}, { immediate: true });
+
 
 // 切换 Pod
 const changepod = (pod: PodData) => {
@@ -268,9 +260,13 @@ function parseMemory(memory: string): number {
 
 // 计算 CPU 使用率（示例，实际需要根据节点资源来计算）
 function calculateCpuUsage(): number {
-  if (totalCpuRequests.value && cpuInfo.value) {
-    const totalNodeCpu = parseFloat(cpuInfo.value.cpu) * 1000; // 假设节点 CPU 是以核为单位
-    return (totalCpuRequests.value / totalNodeCpu) * 100;
+  if (podInfo.value?.spec.nodename) {
+    const node = nodeStore.nodes.find(node => node.nodename === podInfo.value?.spec.nodename);
+    
+    if (node && totalCpuRequests.value) {
+      const totalNodeCpu = parseFloat(node.cpu) * 1000; // 假设节点的可分配 CPU 是以核为单位
+      return (totalCpuRequests.value / totalNodeCpu) * 100;
+    }
   }
   return 0;
 }

@@ -1,7 +1,8 @@
 // store/podStore.ts
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
-
+import { NodeData } from './nodeStore';
+import { useNodeStore } from './nodeStore';
 // 定义 PodData 接口（保持不变）
 export interface PodData {
   apiVersion: string;
@@ -11,7 +12,7 @@ export interface PodData {
     namespace: string;
   };
   spec: {
-    nodeName: string;  // 添加 nodeName 属性
+    nodename?: string;  // 添加 nodeName 属性
     containers: Array<{
       name: string;
       image: string;
@@ -43,6 +44,7 @@ export interface PodData {
 export const usePodStore = defineStore('podStore', () => {
   // 初始化 pods 数据
   const pods = ref<PodData[]>([]);
+  const nodeStore = useNodeStore();
 
   // 从 localStorage 加载已存储的 Pods
   const loadPods = () => {
@@ -64,7 +66,7 @@ export const usePodStore = defineStore('podStore', () => {
             namespace: "default"
           },
           spec: {
-            nodeName: "test",  // 确保与节点的 nodename 匹配
+            nodename: "test",  // 确保与节点的 nodename 匹配
             containers: [
               // 容器列表
             ],
@@ -99,6 +101,26 @@ export const usePodStore = defineStore('podStore', () => {
     pods.value = pods.value.filter((pod) => pod.metadata.name !== podName);
   };
 
+  // 更新 Pod 的节点名
+  const updatePodNode = (podName: string, nodeName: string) => {
+    const pod = pods.value.find(p => p.metadata.name === podName);
+    const node = nodeStore.nodes.find(n => n.nodename === nodeName);
+
+    if (pod) {
+      if (node) { // 检查 node 是否存在
+        node.pods = node.pods || []; // 确保 node.pods 存在
+        node.pods.push(pod); // 将 pod 添加到节点的 pods 列表中
+      } else {
+        console.warn(`Node with name ${nodeName} not found.`);
+      }
+
+      pod.spec.nodename = nodeName; // 更新 Pod 的节点名
+    } else {
+      console.warn(`Pod with name ${podName} not found.`);
+    }
+  };
+
+
   // 返回数据和方法
-  return { pods, addPod, removePod };
+  return { pods, addPod, removePod, updatePodNode };
 });

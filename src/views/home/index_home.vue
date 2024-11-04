@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <h1>我是一级路由展示登录成功的数据</h1>
-    </div>
+    <el-card style="height: 100%;">
+
+    </el-card>
 </template>
 
 <script setup lang="ts">

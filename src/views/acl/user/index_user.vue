@@ -1,7 +1,7 @@
 <template>
     <el-card body-class="background">
       <!-- CPU 卡片 -->
-      <el-card shadow="hover" class="cpu">
+      <el-card shadow="hover" class="cpu" style="margin: 10px;">
         <template #header>
           <div class="card-header">
             <span>CPU 信息</span>
@@ -36,7 +36,7 @@
       </el-card>
   
       <!-- 内存卡片 -->
-      <el-card shadow="hover" class="memory">
+      <el-card shadow="hover" class="memory" style="margin: 10px;">
         <template #header>
           <div class="card-header">
             <span>内存 信息</span>
@@ -71,10 +71,10 @@
       </el-card>
   
       <!-- 网络卡片 -->
-      <el-card shadow="hover" class="net">
+      <el-card shadow="hover" class="net" style="margin: 10px;">
         <template #header>
           <div class="card-header">
-            <span>网络 信息</span>
+            <span>GPU 信息</span>
             <el-dropdown style="float: right;">
               <span class="el-dropdown-link">
                 切换节点
@@ -98,7 +98,7 @@
         <el-descriptions title="网络">
           <el-descriptions-item label="Name">{{ cpuInfo?.nodename }}</el-descriptions-item>
           <el-descriptions-item label="ID">{{ cpuInfo?.nodeID }}</el-descriptions-item>
-          <el-descriptions-item label="网络">{{ cpuInfo?.net }}</el-descriptions-item>
+          <el-descriptions-item label="GPU">{{ cpuInfo?.gpu }}</el-descriptions-item>
           <el-descriptions-item label="状态">
             <el-tag size="small">{{ cpuInfo?.nodestatus }}</el-tag>
           </el-descriptions-item>
@@ -106,7 +106,7 @@
       </el-card>
   
       <!-- 节点表格 -->
-      <el-card style="width: 100%; padding: 10px" height="350" class="node">
+      <el-card style="width: 100%; padding: 10px;margin: 10px;" height="350" class="node" >
         <el-table :data="nodeStore.nodes" height="250" style="width: 100%">
           <el-table-column prop="nodename" label="节点名称" width="180" />
           <el-table-column prop="nodeID" label="节点ID" width="180" />

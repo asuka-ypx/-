@@ -18,6 +18,7 @@ table_data = [
         "nodestatus": "Ready",
         "cpu": "2",
         "memory": "124MiB",
+        "gpu": "4",
         "conditions": "Healthy",
         "description": "这个是测试节点一！！！",
     },
@@ -61,6 +62,8 @@ async def schedule_request(request):
     pod = request.json.get("pod")
     function = request.json.get("function")
 
+    print("/api/schedule",pod,function)
+    
     if not pod or not function:
         return json({"message": "缺少必要的参数"}, status=400)
 
@@ -77,7 +80,9 @@ async def schedule_request(request):
 @app.get("/api/schedule/progress")
 async def schedule_progress(request):
     pod = request.args.getlist("pod[]")
-
+    
+    print("/api/schedule/progress",pod)
+    
     if not pod:
         return json({"progress": "任务未找到"}, status=404)
 
@@ -92,7 +97,9 @@ async def schedule_progress(request):
 @app.get("/api/schedule/result")
 async def schedule_result(request):
     pod = request.args.getlist("pod[]")
-
+    
+    print("/api/schedule/result",pod)
+    
     if not pod:
         return json({"result": "任务未找到"}, status=404)
 
@@ -101,7 +108,10 @@ async def schedule_result(request):
         return json({"result": "任务未找到"}, status=404)
 
     result = tasks[task_id]["result"] or "调度尚未完成"
-    return json({"result": result})
+    return json({"result": pod,"nodename":"test"})
+
+
+
 
 
 async def execute_task(task_id):
