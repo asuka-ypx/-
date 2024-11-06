@@ -80,7 +80,7 @@ export const constantRoute = [
                 name: 'node_others',
                 meta: {
                     title: '其他',
-                    hidden: false,
+                    hidden: true,
                     icon: 'Grid'
                 }
             },
@@ -125,7 +125,7 @@ export const constantRoute = [
                 name: 'pod_others',
                 meta: {
                     title: '其他',
-                    hidden: false,
+                    hidden: true,
                     icon: 'Grid'
                 }
             },

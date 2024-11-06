@@ -1,7 +1,6 @@
 // store/podStore.ts
 import { defineStore } from 'pinia';
-import { ref, watch } from 'vue';
-import { NodeData } from './nodeStore';
+import { ref, watch,computed } from 'vue';
 import { useNodeStore } from './nodeStore';
 // 定义 PodData 接口（保持不变）
 export interface PodData {
@@ -20,12 +19,12 @@ export interface PodData {
         requests: {
           cpu: string;
           memory: string;
-          'nvidia.com/gpu'?: string;
+          gpu?: string;
         };
         limits: {
           cpu: string;
           memory: string;
-          'nvidia.com/gpu'?: string;
+          gpu?: string;
         };
       };
       ports?: Array<{
@@ -102,25 +101,26 @@ export const usePodStore = defineStore('podStore', () => {
   };
 
   // 更新 Pod 的节点名
-  const updatePodNode = (podName: string, nodeName: string) => {
-    const pod = pods.value.find(p => p.metadata.name === podName);
-    const node = nodeStore.nodes.find(n => n.nodename === nodeName);
+  // const updatePodNode = (podName: string, nodeName: string) => {
+  //   const pod = pods.value.find(p => p.metadata.name === podName);
+  //   const node = nodeStore.nodes.find(n => n.nodename === nodeName);
 
-    if (pod) {
-      if (node) { // 检查 node 是否存在
-        node.pods = node.pods || []; // 确保 node.pods 存在
-        node.pods.push(pod); // 将 pod 添加到节点的 pods 列表中
-      } else {
-        console.warn(`Node with name ${nodeName} not found.`);
-      }
+  //   if (pod) {
+  //     if (node) { // 检查 node 是否存在
+  //       node.pods = node.pods || []; // 确保 node.pods 存在
+  //       node.pods.push(pod); // 将 pod 添加到节点的 pods 列表中
+  //     } else {
+  //       console.warn(`Node with name ${nodeName} not found.`);
+  //     }
 
-      pod.spec.nodename = nodeName; // 更新 Pod 的节点名
-    } else {
-      console.warn(`Pod with name ${podName} not found.`);
-    }
-  };
-
-
+  //     pod.spec.nodename = nodeName; // 更新 Pod 的节点名
+  //   } else {
+  //     console.warn(`Pod with name ${podName} not found.`);
+  //   }
+  // };
+  // 获取 Pod 的数量
+  const getPodCount = computed(() => pods.value.length);
+ 
   // 返回数据和方法
-  return { pods, addPod, removePod, updatePodNode };
+  return { pods, addPod, removePod, getPodCount };
 });

@@ -11,11 +11,11 @@ spec:
         requests:
           cpu: "500m" # 请求 500 毫核 CPU
           memory: "256Mi" # 请求 256 MiB 内存
-          nvidia.com/gpu: "1" # 请求 1 个 GPU（可选）
+          gpu: "1" # 请求 1 个 GPU（可选）
         limits:
           cpu: "1" # 限制 1 核 CPU
           memory: "512Mi" # 限制 512 MiB 内存
-          nvidia.com/gpu: "1" # 限制 1 个 GPU（可选）
+          gpu: "1" # 限制 1 个 GPU（可选）
       ports:
         - containerPort: 80
         

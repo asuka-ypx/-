@@ -84,17 +84,23 @@ const form = reactive({
 // 添加 Pod
 const confirm = async () => {
   try {
-    // 将 YAML 字符串解析为对象
-    const parsedData = YAML.load(form.yamlContent);
+    // // 将 YAML 字符串解析为对象
+    // const parsedData = YAML.load(form.yamlContent);
+
+    // 获取用户输入的 JSON 字符串
+    const jsonString = form.yamlContent;
+
+    // 尝试将 JSON 字符串解析为对象
+    const parsedData = JSON.parse(jsonString);
 
     // 检查是否存在 status 字段
     if (!parsedData.status) {
       parsedData.status = { phase: 'Pending' }; // 设置默认状态
     }
     // 发送请求到后端（根据需要）
-    const response = await axios.post('http://localhost:8000/pod', parsedData);
+    const response = await axios.post('http://10.252.65.218:8001/pods', parsedData);
 
-    if (response.status === 200) {
+    if (response.status === 201) {
       ElMessage.success('Pod 添加成功');
       open.value = false; // 关闭对话框
       // 更新显示数据
@@ -124,6 +130,8 @@ const handleDelete = async (pod) => {
 
     // 从 store 中移除 Pod
     podStore.removePod(pod.metadata.name);
+    const deletePod = await axios.delete(`http://10.252.65.218:8001/nodes/${pod.metadata.name}`);
+    console.log("删除pod信息", deletePod)
     ElMessage.success('Pod 删除成功');
   } catch (error) {
     if (error !== 'cancel') {

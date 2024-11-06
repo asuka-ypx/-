@@ -53,10 +53,10 @@
         <el-card style="margin: 10px;" shadow="hover">
             <h4>调度结果</h4>
             <el-card v-for="(node, index) in nodeStore.nodes " :key="index" shadow="hover" style="margin: 10px;">
-                <h5>{{ node.nodename }}节点</h5>
+                <h5>{{ node.name }}节点</h5>
                 <el-card v-for="(pod, index) in node.pods" :key="index" shadow="hover" style="width:60%">
                     <el-collapse>
-                        <el-collapse-item :title="pod.metadata.name">
+                        <el-collapse-item :title="pod?.metadata.name">
                             <el-descriptions  border>
                                 <el-descriptions-item label="Pod Name">
                                     {{ pod?.metadata.name }}

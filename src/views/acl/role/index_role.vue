@@ -1,16 +1,34 @@
 <template>
     <el-card>
         <el-table :data="nodeStore.nodes" style="width: 100%" shadow="hover">
-            <el-table-column label="节点名称" prop="nodename" />
-            <el-table-column label="节点ID" prop="nodeID" />
-            <el-table-column label="节点状态" prop="nodestatus" />
-            <el-table-column label="节点cpu容量" prop="cpu" />
-            <el-table-column label="节点内存容量" prop="memory" />
+            <el-table-column label="节点名称" prop="name" />
+            <el-table-column label="节点状态" prop="status" />
+            <el-table-column label="节点cpu容量" prop="total_cpu" />
+            <el-table-column label="节点内存容量" prop="total_memory" />
             <el-table-column align="right">
                 <template #header>
-                    <el-button plain @click="open">添加节点</el-button>
+                    <el-button plain @click="open = true">添加节点</el-button>
+                    <el-dialog v-model="open" title="添加节点" :append-to-body="true" style="width: 600px;">
+                        <div>
+                            <span>节点名称</span>
+                            <el-input v-model="requestParams.name" placeholder="请输入节点名字"
+                                style="width:80%;margin: 15px;" />
+                        </div>
+                        <div>
+                            <span>节点地址</span>
+                            <el-input v-model="requestParams.ip_address" placeholder="请输入节点IP"
+                                style="width:80%;margin: 15px;"></el-input>
+                        </div>
 
+                        <template #footer>
+                            <span class="dialog-footer">
+                                <el-button @click="open = false">Cancel</el-button>
+                                <el-button type="primary" @click="addnode"> Confirm </el-button>
+                            </span>
+                        </template>
+                    </el-dialog>
                 </template>
+
                 <template #default="scope">
                     <el-button size="small" type="danger" @click="handleDelete(scope.row)">
                         Delete
@@ -24,7 +42,6 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { tableData } from '../../../data/data_node';
 import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
 //导入pinia仓库中数据
@@ -32,57 +49,59 @@ import { useNodeStore, NodeData } from '../../../store/medules/nodeStore';
 
 const nodeStore = useNodeStore();
 
+const open = ref(false)
 
 // 输入信息的数据模型
 const requestParams = ref({
-    nodename: '',
-    nodeType: ''
+    name: '',
+    ip_address: '',
+    labels: {
+    },
+    annotations: {
+    }
 });
-const open = async () => {
-    ElMessageBox.prompt('请输入节点的IP地址', '添加节点', {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        // inputPattern:
-        //   /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
-        // inputErrorMessage: 'Invalid Email',
-    })
-        .then(async ({ value }) => {
-            try {
-                // 假设后端请求地址为 /api/get-node-info
-                const response = await axios.post(value, requestParams.value);
 
-                // 假设后端返回的数据结构为 { data: { nodename, nodeID, ... } }
-                const newNode: NodeData = response.data.data;
+const addnode = async () => {
 
-                // 将新节点数据添加到表格数据中
-                nodeStore.addNode(newNode);
-                console.log(nodeStore.nodes);
+    const requestData = JSON.stringify(requestParams.value);
+    console.log("发送的节点信息", requestData);
+    const response = await axios.post("http://10.252.65.218:8001/nodes", requestData);
+    //URL为服务器地址 @app.route('/nodes', methods=['POST'])
+    //结果返回为return response.json({'message': f"Node '{name}' added successfully."}, status=201)
+    console.log("post后返回的response", response)
+    //获取所有节点信息  @app.route('/nodes', methods=['GET'])
+    const Nodes = await axios.get("http://10.252.65.218:8001/nodes");
+    console.log("获取所有节点的信息", Nodes)
 
-            } catch (error) {
-                console.error("获取节点信息失败:", error);
-            }
-            ElMessage({
-                type: 'success',
-                message: `节点添加成功，地址为:${value}`,
-            })
-        })
-        .catch(() => {
-            ElMessage({
-                type: 'info',
-                message: 'Input canceled',
-            })
-        })
+    // 获取 Pinia 中已存在的节点
+    const existingNodes = nodeStore.nodes;
+    // 将服务器返回的节点对象转换为数组
+    const allNodes = Object.values(Nodes.data.nodes);
+
+    console.log(allNodes)
+
+    // 将从服务器获取的节点添加到 Pinia 中，但只添加没有的节点
+    allNodes.forEach((newNode) => {
+        const exists = existingNodes.some((node) => node.name === newNode.name);
+        if (!exists) {
+            nodeStore.addNode(newNode);  // 如果节点不存在，则添加到 Pinia 中
+        }
+    });
+
+    // 打印 Pinia 中当前的节点信息
+    console.log("节点小仓库信息", nodeStore.nodes);
+
 }
-const handleEdit = () => {
-    console.log('editing')
-}
+
 const handleDelete = (node: NodeData) => {
-    ElMessageBox.confirm(`确定要删除节点 ${node.nodename} 吗？`, '确认删除', {
+    ElMessageBox.confirm(`确定要删除节点 ${node.name} 吗？`, '确认删除', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
-    }).then(() => {
-        nodeStore.removeNode(node.nodeID);
+    }).then(async () => {
+        nodeStore.removeNode(node.name);
+        const deletenode = await axios.delete(`http://10.252.65.218:8001/nodes/${node.name}`);
+        console.log("删除节点的返回结果", deletenode);
         ElMessage({
             type: 'success',
             message: '节点已成功删除',
@@ -93,6 +112,7 @@ const handleDelete = (node: NodeData) => {
             message: '取消删除',
         });
     });
+
 }
 </script>
 
