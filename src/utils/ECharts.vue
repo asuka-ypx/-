@@ -95,17 +95,18 @@ export default defineComponent({
         },
         tooltip: {
           trigger: "axis",
-          formatter: (params) => {
-            if (!Array.isArray(params) || params.length === 0) return "";
-            const { dataIndex } = params[0];
-            const historyDDQN = scheduleHistory_DDQN.value[dataIndex];
-            return `
-              时间: ${historyDDQN.timestamp}<br>
-              Pod 名称: ${historyDDQN.pod_name}<br>
-              节点: ${historyDDQN.node_name}<br>
-              DDQN 奖励: ${historyDDQN.reward}
-            `;
-          },
+          // formatter: (params) => {
+          //   if (!Array.isArray(params) || params.length === 0) return "";
+          //   const { dataIndex } = params[0];
+          //   const historyDDQN = scheduleHistory_DDQN.value[dataIndex];
+          //   return `
+          //     时间: ${historyDDQN.timestamp}<br>
+          //     Pod 名称: ${historyDDQN.pod_name}<br>
+          //     节点: ${historyDDQN.node_name}<br>
+          //     DDQN 奖励: ${historyDDQN.reward}
+          //   `;
+          // },
+          show: true,
         },
         xAxis: {
           type: "category",
@@ -114,12 +115,15 @@ export default defineComponent({
           axisLabel: {
             rotate: 45, // 避免时间戳重叠
           },
+          axisPointer: {
+            type: "line" // 坐标轴��影
+          },
         },
         yAxis: {
           type: "value",
           name: "Reward",
-          min: 1,   // 设置Y轴的最小值
-          max: 1.8,   // 设置Y轴的最大值
+          min: 1.1,   // 设置Y轴的最小值
+          max: 1.6,   // 设置Y轴的最大值
         },
         series: [
           {
@@ -128,7 +132,14 @@ export default defineComponent({
             data: rewards(scheduleHistory_DDQN.value),
             smooth: true,
             areaStyle: {},
+            encode: {
+            x: 'Times',
+            y: 'Reward',
+            itemName: 'Pod',
+            tooltip: ['Reward']
+          }
           },
+          
         ],
       };
 
@@ -163,8 +174,8 @@ export default defineComponent({
         yAxis: {
           type: "value",
           name: "Reward",
-          min: 1,   // 设置Y轴的最小值
-          max: 1.8,   // 设置Y轴的最大值
+          min: 1.1,   // 设置Y轴的最小值
+          max: 1.6,   // 设置Y轴的最大值
         },
         series: [
           {

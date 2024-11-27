@@ -56,7 +56,7 @@ export const constantRoute = [
         children: [
             {
                 path: '/node/info',
-                component: () => import('../views/acl/user/index_user.vue'),
+                component: () => import('../views/node/node_info/node_info.vue'),
                 name: 'node_info',
                 meta: {
                     title: '节点信息',
@@ -66,7 +66,7 @@ export const constantRoute = [
             },
             {
                 path: '/node/manage',
-                component: () => import("../views/acl/role/index_role.vue"),
+                component: () => import("../views/node/node_manage/node_manage.vue"),
                 name: 'node_manage',
                 meta: {
                     title: '节点管理',
@@ -74,18 +74,6 @@ export const constantRoute = [
                     icon: 'Tools'
                 }
             },
-            {
-                path: '/node/others',
-                component: () => import("../views/acl/permission/index_permission.vue"),
-                name: 'node_others',
-                meta: {
-                    title: '其他',
-                    hidden: true,
-                    icon: 'Grid'
-                }
-            },
-
-
         ]
     },
 
@@ -101,7 +89,7 @@ export const constantRoute = [
         children: [
             {
                 path: '/pod/info',
-                component: () => import("../views/product/trademark/index_trademark.vue"),
+                component: () => import("../views/pod/pod_info/pod_info.vue"),
                 name: 'pod_info',
                 meta: {
                     title: 'Pod信息',
@@ -111,22 +99,12 @@ export const constantRoute = [
             },
             {
                 path: '/pod/manage',
-                component: () => import("../views/product/attr/index_attr.vue"),
+                component: () => import("../views/pod/pod_manage/pod_manage.vue"),
                 name: 'pod_manage',
                 meta: {
                     title: 'Pod管理',
                     hidden: false,
                     icon: 'Tools'
-                }
-            },
-            {
-                path: '/pod/others',
-                component: () => import("../views/product/spu/index_spu.vue"),
-                name: 'pod_others',
-                meta: {
-                    title: '其他',
-                    hidden: true,
-                    icon: 'Grid'
                 }
             },
 

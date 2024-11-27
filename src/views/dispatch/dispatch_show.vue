@@ -1,10 +1,10 @@
 <template>
     <el-card >
-        <p>测试展示</p>
-        <el-button @click="setting">Default</el-button>
-        <el-dialog v-model="show" title="调度算法测试">
+        <p>调度详情</p>
+        <el-button @click="setting" type="primary">调度模拟</el-button>
+        <el-dialog v-model="show" title="调度模拟">
             <main>
-                <p>展示算法的一些参数</p>
+                <p>模拟25个pod调度到10个node上</p>
             </main>
             <template #footer>
                 <span class="dialog-footer">
@@ -38,10 +38,11 @@ const setting = () => {
 const confirm = async () => {
     //点击按钮后获取测试后返回的数据
     const apiUrl = import.meta.env.VITE_APP_SERVER_URL;
-    const result_DDQN = await axios.post(apiUrl + '/DDQN_schedule_history')
-    const result_kube = await axios.post(apiUrl + '/kube_schedule_history')
-    historyStore_DDQN.setHistory(result_DDQN)
-    historyStore_kube.setHistory(result_kube)
+    const result_DDQN = await axios.get(apiUrl + '/DDQN_schedule_history')
+    const result_kube = await axios.get(apiUrl + '/kube_schedule_history')
+    console.log(result_DDQN.data.schedule_history)
+    historyStore_DDQN.setHistory(result_DDQN.data.schedule_history)
+    historyStore_kube.setHistory(result_kube.data.schedule_history)
 
     show.value = false;
     //获取信息
