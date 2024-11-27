@@ -232,7 +232,7 @@ const totalMemoryLimits = computed(() => {
 const totalGpuRequests = computed(() => {
   if (podInfo.value) {
     return podInfo.value.spec.containers.reduce((total, container) => {
-      const gpuRequest = parseInt(container.resources.requests['nvidia.com/gpu'] || '0', 10);
+      const gpuRequest = parseInt(container.resources.requests.gpu || '0', 10);
       return total + gpuRequest;
     }, 0);
   }
@@ -261,10 +261,10 @@ function parseMemory(memory: string): number {
 // 计算 CPU 使用率（示例，实际需要根据节点资源来计算）
 function calculateCpuUsage(): number {
   if (podInfo.value?.spec.nodename) {
-    const node = nodeStore.nodes.find(node => node.nodename === podInfo.value?.spec.nodename);
+    const node = nodeStore.nodes.find(node => node.name === podInfo.value?.spec.nodename);
     
     if (node && totalCpuRequests.value) {
-      const totalNodeCpu = parseFloat(node.cpu) * 1000; // 假设节点的可分配 CPU 是以核为单位
+      const totalNodeCpu = parseFloat(node.total_cpu) * 1000; // 假设节点的可分配 CPU 是以核为单位
       return (totalCpuRequests.value / totalNodeCpu) * 100;
     }
   }

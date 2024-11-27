@@ -1,5 +1,6 @@
 <template>
-    <el-card >
+    <!-- 调度管理 -->
+    <el-card>
 
         <!-- 调度过程卡片 -->
         <el-card style="margin: 10px;" shadow="hover">
@@ -30,7 +31,7 @@
             <el-form :model="form" style="max-width: 800px">
                 <el-form-item label="调度任务">
                     <el-select v-model="form.pod" placeholder="选择需要执行的任务" multiple>
-                        <el-option v-for="(pod, index) in pendingPods" :key="index" :label="pod.metadata.name"
+                        <el-option v-for="(pod, index) in podStore.pods" :key="index" :label="pod.metadata.name"
                             :value="pod.metadata.name" />
                     </el-select>
                 </el-form-item>
@@ -57,7 +58,7 @@
                 <el-card v-for="(pod, index) in node.pods" :key="index" shadow="hover" style="width:60%">
                     <el-collapse>
                         <el-collapse-item :title="pod?.metadata.name">
-                            <el-descriptions  border>
+                            <el-descriptions border>
                                 <el-descriptions-item label="Pod Name">
                                     {{ pod?.metadata.name }}
                                 </el-descriptions-item>
@@ -68,8 +69,8 @@
                                     {{ pod?.spec.restartPolicy }}
                                 </el-descriptions-item>
                                 <el-descriptions-item label="Containers">
-                                    <el-table :data="pod?.spec.containers || []"
-                                        style="width: 100%; margin-top: 10px;" size="small">
+                                    <el-table :data="pod?.spec.containers || []" style="width: 100%; margin-top: 10px;"
+                                        size="small">
                                         <el-table-column prop="name" label="Container Name" width="180" />
                                         <el-table-column prop="image" label="Image" width="200" />
                                         <el-table-column label="Resources">
@@ -124,12 +125,12 @@ const podStore = usePodStore();
 //获取nodeStore
 const nodeStore = useNodeStore();
 //筛选pods
-const pendingPods = computed(() => {
-    return podStore.pods.filter(pod => pod.status?.phase === 'Pending');
-});
+// const pendingPods = computed(() => {
+//     return podStore.pods.filter(pod => pod.metadata.status === 'Pending');
+// });
 // 定义为响应式变量
 const form = reactive({
-    pod: '',
+    pod: [] as string[], // 初始化为字符串数组
     function: '',
     //
 })
@@ -151,6 +152,7 @@ const stepMessages = reactive({
     step3: '',
 });
 
+
 // 提交调度任务函数
 const submitForm = async () => {
     click.value = false;
@@ -158,56 +160,37 @@ const submitForm = async () => {
         console.log(form.pod)
         // 第一步：发送请求
         currentStep.value = 1;
-        const responseStep1 = await axios.post('http://localhost:8000/api/schedule', {
-            pod: form.pod,
-            function: form.function,
-        });
 
-        stepMessages.step1 = responseStep1.data.message || '服务器已接收到调度请求';
-        console.log('调度请求成功：', responseStep1.data);
-
-        // 启动定时器以检查调度状态
-        intervalId = setInterval(async () => {
-            // 请求调度进度
-            const progressResponse = await axios.get('http://localhost:8000/api/schedule/progress', {
-                params: { pod: form.pod }
-            });
-            progress1.value = 50
-            status1.value = "success";
-
-            // 更新步骤信息
-            stepMessages.step2 = `调度中，当前进度: ${progressResponse.data.progress || '未知进度'}`;
-            console.log('调度进行中')
-            // 检查调度是否完成
-            if (progressResponse.data.progress === '100%') {
-                clearInterval(intervalId); // 清除定时器
-                currentStep.value = 3; // 更新当前步骤
-                // 请求调度结果
-                const responseStep3 = await axios.get('http://localhost:8000/api/schedule/result', {
-                    params: { pod: form.pod }
-                });
-                progress1.value = 100
-                indeterminate1.value = false;
-
-                // 获取 pod 名称
-                const podNames = responseStep3.data.result; // 直接获取对象
-                const nodename = responseStep3.data.nodename; // 获取节点名称
-                stepMessages.step3 = '调度成功';
-
-                console.log('调度结果：', responseStep3.data);
-
-                // 提取 Pod 名称并更新节点名称
-
-                if (Array.isArray(podNames)) {
-                    podNames.forEach(pod => {
-                        // 假设你有一个方法来更新 Pod 的节点名称
-                        podStore.updatePodNode(pod, nodename);
-                    });
-                }
-                click.value = false; // 关闭对话框
-
+        // 获取选中的 pod 信息并格式化
+        const selectedPods = form.pod.map(podName => {
+            const pod = podStore.pods.find(p => p.metadata.name === podName);
+            if (pod) {
+                return {
+                    apiVersion: "v1",
+                    kind: "Pod",
+                    metadata: {
+                        name: pod.metadata.name,
+                        namespace: pod.metadata.namespace || "default",
+                        status: pod.metadata.status || "pending"
+                    }
+                };
             }
-        }, 1000); // 每2秒请求一次调度状态
+            return null;
+        }).filter(pod => pod !== null);
+
+        console.log(selectedPods)
+
+        // 向服务器发送 POST 请求，提交任务
+        const apiUrl = import.meta.env.VITE_APP_SERVER_URL; // Vite 的用法
+        console.log("apiurl",apiUrl)
+        const responseStep1 = await axios.post(apiUrl+'/DDQN_schedule', selectedPods
+            // function: form.function,
+        );
+        console.log("结果返回", responseStep1)
+
+        // stepMessages.step1 = responseStep1.data.message || '服务器已接收到调度请求';
+        // console.log('调度请求成功：', responseStep1.data);
+
 
     } catch (error) {
         clearInterval(intervalId); // 清除定时器

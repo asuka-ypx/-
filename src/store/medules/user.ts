@@ -9,7 +9,6 @@ import type { UserState } from './types/types';
 import { SET_TOKEN, GET_TOKEN,REMOVE_TOKEN } from '../../utils/token';
 //引入路由（常量路由）
 import { constantRoute } from '../../router/routers';
-
 const useUserStore = defineStore('User', {
     //小仓库存储数据的地方
     state: (): UserState => {

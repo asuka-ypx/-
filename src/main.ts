@@ -26,5 +26,7 @@ app.use(pinia);
 app.use(globalComponent);
 //引入路由鉴权文件
 import './permisstion'
+
 //将应用挂载到挂载点
 app.mount('#app')
+//package.json    "build": "vue-tsc -b && vite build",

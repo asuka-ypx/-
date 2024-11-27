@@ -1,4 +1,5 @@
 <template>
+    <!-- 节点管理 -->
     <el-card>
         <el-table :data="nodeStore.nodes" style="width: 100%" shadow="hover">
             <el-table-column label="节点名称" prop="name" />
@@ -65,12 +66,13 @@ const addnode = async () => {
 
     const requestData = JSON.stringify(requestParams.value);
     console.log("发送的节点信息", requestData);
-    const response = await axios.post("http://10.252.65.218:8001/nodes", requestData);
+    const apiUrl = import.meta.env.VITE_APP_SERVER_URL; // Vite 的用法
+    const response = await axios.post(apiUrl+"/nodes", requestData);
     //URL为服务器地址 @app.route('/nodes', methods=['POST'])
     //结果返回为return response.json({'message': f"Node '{name}' added successfully."}, status=201)
     console.log("post后返回的response", response)
     //获取所有节点信息  @app.route('/nodes', methods=['GET'])
-    const Nodes = await axios.get("http://10.252.65.218:8001/nodes");
+    const Nodes = await axios.get(apiUrl+"/nodes");
     console.log("获取所有节点的信息", Nodes)
 
     // 获取 Pinia 中已存在的节点
@@ -90,7 +92,7 @@ const addnode = async () => {
 
     // 打印 Pinia 中当前的节点信息
     console.log("节点小仓库信息", nodeStore.nodes);
-
+    open.value = false;
 }
 
 const handleDelete = (node: NodeData) => {
@@ -100,7 +102,8 @@ const handleDelete = (node: NodeData) => {
         type: 'warning',
     }).then(async () => {
         nodeStore.removeNode(node.name);
-        const deletenode = await axios.delete(`http://10.252.65.218:8001/nodes/${node.name}`);
+        const apiUrl = import.meta.env.VITE_APP_SERVER_URL; // Vite 的用法
+        const deletenode = await axios.delete(apiUrl+`/nodes/${node.name}`);
         console.log("删除节点的返回结果", deletenode);
         ElMessage({
             type: 'success',

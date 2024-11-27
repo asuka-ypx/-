@@ -1,7 +1,7 @@
 <template>
     <el-button size="small" icon="Refresh" circle @click="refresh"></el-button>
     <el-button size="small" icon="FullScreen" circle @click="fullscreen"></el-button>
-    <el-button size="small" icon="Setting" circle></el-button>
+    <el-button size="small" icon="Setting" circle @click = "storeSetting"></el-button>
     <img src="../../../../public/logo.svg" style="width: 24px;height: 24px;margin: 10px 10px">
     <!-- 下拉菜单 -->
     <el-dropdown>
@@ -21,8 +21,14 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import axios from 'axios'
 import useLayOutSettingStore from '../../../store/medules/setting';
 import useUserStore from '../../../store/medules/user';
+
+//导入pinia仓库中数据
+import { useNodeStore, NodeData } from '../../../store/medules/nodeStore';
+import { usePodStore, PodData } from '../../../store/medules/podStore';
+
 let userStore = useUserStore();
 let LayOutSettingStore = useLayOutSettingStore();
 let $router = useRouter();
@@ -37,6 +43,18 @@ const fullscreen = () => {
     }else {
         document.exitFullscreen();
     }
+}
+//更新仓库信息
+const storeSetting = async() => {
+    localStorage.clear();
+    const nodeStore = useNodeStore();
+    const apiUrl = import.meta.env.VITE_APP_SERVER_URL; // Vite 的用法
+    const Nodes = await axios.get(apiUrl+"/nodes");
+    const allNodes = Object.values(Nodes.data.nodes);
+    allNodes.forEach((newNode) => {
+            nodeStore.addNode(newNode);  // 如果节点不存在，则添加到 Pinia 中
+    });
+
 }
 const logout = () => {
     //向服务器发请求\

@@ -1,4 +1,5 @@
 <template>
+  <!-- 节点信息 -->
   <el-card body-class="background">
     <!-- CPU 卡片 -->
     <el-card shadow="hover" class="cpu" style="margin: 10px;">
@@ -56,8 +57,8 @@
       <el-progress type="circle" :percentage="memoryUsage" />
       <el-descriptions title="内存" border>
         <el-descriptions-item label="Name">{{ nodeInfo?.name }}</el-descriptions-item>
-        <el-descriptions-item label="内存总容量">{{ nodeInfo?.total_memory }}</el-descriptions-item>
-        <el-descriptions-item label="内存已分配容量">{{ nodeInfo?.allocated_memory }}</el-descriptions-item>
+        <el-descriptions-item label="内存总容量">{{ MemoryInMB(nodeInfo?.total_memory) }}MB</el-descriptions-item>
+        <el-descriptions-item label="内存已分配容量">{{ MemoryInMB(nodeInfo?.allocated_memory) }}MB</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag size="small">{{ nodeInfo?.status }}</el-tag>
         </el-descriptions-item>
@@ -115,7 +116,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useNodeStore, NodeData } from '../../../store/medules/nodeStore';
 
 const nodeStore = useNodeStore();
@@ -127,6 +128,11 @@ const nodeInfo = ref<NodeData | null>(null);
 if (nodeStore.nodes.length > 0 && !nodeInfo.value) {
   nodeInfo.value = nodeStore.nodes[0];
 }
+
+// 计算属性，将字节转换为 MB
+const MemoryInMB = ((data) => {
+  return (data / (1024 * 1024)).toFixed(2);
+});
 
 // 监听节点数据的变化，更新 nodeInfo
 watch(

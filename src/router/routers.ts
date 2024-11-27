@@ -151,6 +151,16 @@ export const constantRoute = [
                     hidden: false,
                     icon: 'Operation'
                 }
+            },
+            {
+                path: '/dispatch/show',
+                component: () => import('../views/dispatch/dispatch_show.vue'),
+                name: 'Show',
+                meta: {
+                    title: '调度展示',
+                    hidden: false,
+                    icon: 'Operation'
+                }
             }
         ]
     },

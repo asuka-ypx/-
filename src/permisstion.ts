@@ -12,14 +12,15 @@ router.beforeEach(async (to, from, next) => {
     //to:你将要访问哪个路由
     //from：你从哪个路由而来
     //next：路由的放行函数
-    document.title = '平台——' + to.meta.title
+    document.title = '多智能体调度优化平台——' + to.meta.title
     nprogress.start();
 
     const token = userStore.token;
     const username = userStore.username;
     if (token) {
         if (to.path == '/login') {
-            next({ path: '/' })
+            next({ path: 
+                '/' })
         } else {
             if (username) {
                 next();

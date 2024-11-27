@@ -9,6 +9,7 @@ export interface PodData {
   metadata: {
     name: string;
     namespace: string;
+    status: string;
   };
   spec: {
     nodename?: string;  // 添加 nodeName 属性
@@ -33,17 +34,13 @@ export interface PodData {
     }>;
     restartPolicy: string;
   };
-  status?: {
-    phase: string;
-    // 可以添加其他状态字段，如 conditions、hostIP 等
-  };
+  
 }
 
 // 定义 podStore
 export const usePodStore = defineStore('podStore', () => {
   // 初始化 pods 数据
   const pods = ref<PodData[]>([]);
-  const nodeStore = useNodeStore();
 
   // 从 localStorage 加载已存储的 Pods
   const loadPods = () => {
@@ -62,7 +59,8 @@ export const usePodStore = defineStore('podStore', () => {
           kind: "Pod",
           metadata: {
             name: "example-pod",
-            namespace: "default"
+            namespace: "default",
+            status: "available",
           },
           spec: {
             nodename: "test",  // 确保与节点的 nodename 匹配
@@ -90,8 +88,8 @@ export const usePodStore = defineStore('podStore', () => {
 
   // 添加和删除 Pod 的方法（保持不变）
   const addPod = (newPod: PodData) => {
-    if (!newPod.status) {
-      newPod.status = { phase: 'Pending' }; // 设置默认状态为 Pending
+    if (!newPod.metadata.status) {
+      newPod.metadata.status =  'Pending' ; // 设置默认状态为 Pending
     }
     pods.value.push(newPod);
   };

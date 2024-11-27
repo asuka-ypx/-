@@ -1,4 +1,5 @@
 <template>
+  <!-- pod管理 -->
   <el-card>
     <el-table :data="pods" style="width: 100%" shadow="hover">
       <el-table-column label="Pod名称" prop="metadata.name" />
@@ -98,7 +99,8 @@ const confirm = async () => {
       parsedData.status = { phase: 'Pending' }; // 设置默认状态
     }
     // 发送请求到后端（根据需要）
-    const response = await axios.post('http://10.252.65.218:8001/pods', parsedData);
+    const apiUrl = import.meta.env.VITE_APP_SERVER_URL; // Vite 的用法
+    const response = await axios.post(apiUrl+'/pods', parsedData);
 
     if (response.status === 201) {
       ElMessage.success('Pod 添加成功');
@@ -129,8 +131,10 @@ const handleDelete = async (pod) => {
     );
 
     // 从 store 中移除 Pod
+
+    const deletePod = await axios.delete(`http://10.252.75.133:8001/pods/${pod.metadata.name}`);
     podStore.removePod(pod.metadata.name);
-    const deletePod = await axios.delete(`http://10.252.65.218:8001/nodes/${pod.metadata.name}`);
+
     console.log("删除pod信息", deletePod)
     ElMessage.success('Pod 删除成功');
   } catch (error) {
