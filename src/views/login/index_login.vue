@@ -1,7 +1,7 @@
 <template>
     <div class="login_container">
         <el-row>
-            <el-col :span="12" :xs="0">占位</el-col>
+            <el-col :span="12" :xs="0"></el-col>
             <el-col :span="12" :xs="24">
                 <el-form class="login_form" :model="loginForm" :rules="rules" ref="loginForms">
                     <h1>Hello</h1>
@@ -74,16 +74,19 @@ const rules = {
 .login_container {
     width: 100%;
     height: 100vh;
-    background: url('@/assets/images/background.jpg') no-repeat;
+    background: url('@/assets/images/主楼线稿-侧.png') no-repeat;
     background-size: cover;
 
     .login_form {
         position: relative;
         width: 75%;
         top: 30vh;
-        background: url("@/assets/images/background_form.jpg") no-repeat;
+        // background: url("@/assets/images/background_form.jpg") no-repeat;
+        background-color: #326ce5;
         background-size: cover;
         padding: 40px;
+        opacity: 90%;
+        border-radius: 15px;
 
         h1 {
             color: white;

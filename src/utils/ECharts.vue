@@ -2,9 +2,12 @@
   <div>
     <!-- DDQN Reward 折线图 -->
     <div id="chartDDQN" style="width: 100%; height: 600px;"></div>
-
+    <p></p><p></p><p></p><p></p>
     <!-- Kube Reward 折线图 -->
     <div id="chartKube" style="width: 100%; height: 600px;"></div>
+    <p></p><p></p><p></p><p></p>
+    <!-- 奖励总和柱状图 -->
+    <div id="chartRewardSum" style="width: 100%; height: 400px;"></div>
   </div>
 </template>
 
@@ -27,6 +30,7 @@ export default defineComponent({
     // 定义 ECharts 实例
     const chartDDQN = ref<echarts.ECharts | null>(null);
     const chartKube = ref<echarts.ECharts | null>(null);
+    const chartRewardSum = ref<echarts.ECharts | null>(null);
 
     // 从 Pinia Store 获取数据
     const historyStore_DDQN = useHistoryStore_DDQN();
@@ -40,6 +44,10 @@ export default defineComponent({
     const timestamps = (history: ScheduleHistoryItem[]) => history.map(item => item.timestamp);
     const rewards = (history: ScheduleHistoryItem[]) => history.map(item => item.reward);
 
+    // 计算奖励总和
+    const totalReward = (history: ScheduleHistoryItem[]) => {
+      return history.reduce((sum, item) => sum + item.reward, 0);
+    };
     // 更新图表数据
     const updateChartDDQN = () => {
       if (!chartDDQN.value) return;
@@ -76,16 +84,46 @@ export default defineComponent({
         ],
       });
     };
+    // 更新奖励总和柱状图
+    const updateChartRewardSum = () => {
+      if (!chartRewardSum.value) return;
+      const totalDDQN = totalReward(scheduleHistory_DDQN.value);
+      const totalKube = totalReward(scheduleHistory_kube.value);
+
+      chartRewardSum.value.setOption({
+        xAxis: {
+          type: "category",
+          data: ["DDQN", "Kube"],
+        },
+        yAxis: {
+          type: "value",
+          name: "Reward 总和",
+          min: 30,
+        },
+        series: [
+          {
+            name: "Reward Sum",
+            type: "bar",
+            data: [totalDDQN, totalKube],
+            itemStyle: {
+              color: '#73C9E5', // 设置柱状图颜色
+            },
+          },
+        ],
+      });
+    };
 
     // 初始化图表
     const initCharts = () => {
       const chartDomDDQN = document.getElementById("chartDDQN");
       const chartDomKube = document.getElementById("chartKube");
+      const chartDomRewardSum = document.getElementById("chartRewardSum");
 
-      if (!chartDomDDQN || !chartDomKube) return;
+      if (!chartDomDDQN || !chartDomKube || !chartDomRewardSum) return;
 
       chartDDQN.value = echarts.init(chartDomDDQN);
       chartKube.value = echarts.init(chartDomKube);
+      chartRewardSum.value = echarts.init(chartDomRewardSum);
 
       // 设置图表的初始配置
       const optionDDQN: echarts.EChartsOption = {
@@ -133,13 +171,13 @@ export default defineComponent({
             smooth: true,
             areaStyle: {},
             encode: {
-            x: 'Times',
-            y: 'Reward',
-            itemName: 'Pod',
-            tooltip: ['Reward']
-          }
+              x: 'Times',
+              y: 'Reward',
+              itemName: 'Pod',
+              tooltip: ['Reward']
+            }
           },
-          
+
         ],
       };
 
@@ -191,6 +229,7 @@ export default defineComponent({
       // 设置图表选项
       chartDDQN.value.setOption(optionDDQN);
       chartKube.value.setOption(optionKube);
+      updateChartRewardSum();  // 初始化时更新柱状图
     };
 
     // 使用 watchEffect 或者 watch 来监听数据变化
@@ -207,6 +246,14 @@ export default defineComponent({
       (newHistory) => {
         scheduleHistory_kube.value = newHistory;
         updateChartKube();  // 更新图表
+      }
+    );
+
+    watch(
+      () => scheduleHistory_kube.value,
+      () => {
+        updateChartKube();  // 更新 Kube 折线图
+        updateChartRewardSum();  // 更新柱状图
       }
     );
 

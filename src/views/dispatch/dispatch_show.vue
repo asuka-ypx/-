@@ -1,6 +1,6 @@
 <template>
     <el-card >
-        <p>调度详情</p>
+        <p class="title">调度详情（通过模拟节点和Pod返回奖励函数）</p>
         <el-button @click="setting" type="primary">调度模拟</el-button>
         <el-dialog v-model="show" title="调度模拟">
             <main>
@@ -21,7 +21,6 @@
 </template>
 
 <script setup>
-import { defineComponent } from "vue";
 import DynamicLineChart from "../../utils/ECharts.vue";
 import { useHistoryStore_DDQN } from '../../store/medules/historyStore_DDQN'
 import { useHistoryStore_kube } from '../../store/medules/historyStore_kube'

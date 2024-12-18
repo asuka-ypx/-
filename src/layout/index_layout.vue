@@ -5,8 +5,8 @@
             <Logo></Logo>
             <!--展示菜单  -->
             <el-scrollbar class="scrollbar">
-                <el-menu :collapse="LayOutSettingStore.fold" :default-active="$route.path" background-color="rgb(180, 180, 180)"
-                    active-text-color="lightblue">
+                <el-menu :collapse="LayOutSettingStore.fold" :default-active="$route.path"
+                    background-color="rgb(180, 180, 180)" active-text-color="lightblue">
                     <Menu :menuList="userStore.menuRoutes">
                     </Menu>
                 </el-menu>
@@ -73,6 +73,7 @@ let $route = useRoute();
         top: 0px;
         left: $base-menu-width;
         transition: all 0.3s;
+
         &.fold {
             width: calc(100% - $base-menu-fold-width);
             left: $base-menu-fold-width;
@@ -89,6 +90,7 @@ let $route = useRoute();
         padding: 20px;
         overflow: auto;
         transition: all 0.3s;
+
         &.fold {
             width: calc(100% - $base-menu-fold-width);
             left: $base-menu-fold-width;

@@ -1,5 +1,5 @@
 运行：pnpm install (下载依赖)，pnpm run dev启动
-添加操作测试：运行test.py(提前安装sanic和跨域工具)
+ecs挂载：scp -r "C:\Users\ypx\Downloads\project-main\project-main\dist" ecs-assist-user@59.110.124.45:/var/www/
 
 目录树
 .
@@ -40,9 +40,6 @@
 │   │   ├── SvgIcon
 │   │   │   └── SvgIconIndex.vue
 │   │   └── index_components.ts
-│   ├── data
-│   │   ├── data_node.ts
-│   │   └── data_pod.ts
 │   ├── layout
 │   │   ├── index_layout.vue
 │   │   ├── logo
@@ -86,13 +83,6 @@
 │   ├── views
 │   │   ├── 404
 │   │   │   └── index_404.vue
-│   │   ├── acl
-│   │   │   ├── permission
-│   │   │   │   └── index_permission.vue
-│   │   │   ├── role
-│   │   │   │   └── index_role.vue
-│   │   │   └── user
-│   │   │       └── index_user.vue
 │   │   ├── dispatch
 │   │   │   ├── dispatch_show.vue
 │   │   │   └── index_dispatch.vue
@@ -100,15 +90,16 @@
 │   │   │   └── index_home.vue
 │   │   ├── login
 │   │   │   └── index_login.vue
-│   │   ├── product
-│   │   │   ├── attr
-│   │   │   │   └── index_attr.vue
-│   │   │   ├── sku
-│   │   │   │   └── index_sku.vue
-│   │   │   ├── spu
-│   │   │   │   └── index_spu.vue
-│   │   │   └── trademark
-│   │   │       └── index_trademark.vue
+│   │   ├── node
+│   │   │   ├── node_info
+│   │   │   │   └── node_info.vue
+│   │   │   └── node_manage
+│   │   │       └── node_manage.vue
+│   │   ├── pod
+│   │   │   ├── pod_info
+│   │   │   │   └── pod_info.vue
+│   │   │   └── pod_manage
+│   │   │       └── pod_manage.vue
 │   │   └── screen
 │   │       └── index_screen.vue
 │   └── vite-env.d.ts
@@ -122,5 +113,4 @@
 ├── tsconfig.json
 ├── tsconfig.node.json
 ├── tsconfig.node.tsbuildinfo
-├── typedoc.json
 └── vite.config.ts
