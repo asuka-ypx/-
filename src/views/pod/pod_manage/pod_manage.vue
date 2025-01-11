@@ -18,9 +18,9 @@
           <el-button plain type="primary" @click="openDialog">添加Pod</el-button>
           <el-dialog v-model="open" title="添加Pod" width="500" :modal="true" z-index="2000" :append-to-body="true">
             <el-form :model="form">
-              <el-form-item label="Pod (YAML 格式)" :label-width="formLabelWidth">
+              <el-form-item label="Pod (JSON 格式)" :label-width="formLabelWidth">
                 <el-input v-model="form.yamlContent" style="width: 100%" :rows="20" type="textarea"
-                  placeholder="请输入 YAML 格式的 Pod 配置" />
+                  placeholder="请输入 JSON 格式的 Pod 配置" />
               </el-form-item>
             </el-form>
 
@@ -132,7 +132,7 @@ const handleDelete = async (pod) => {
 
     // 从 store 中移除 Pod
 
-    const deletePod = await axios.delete(`http://10.252.75.133:8001/pods/${pod.metadata.name}`);
+    const deletePod = await axios.delete(`http://192.168.1.111:8001/pods/${pod.metadata.name}`);
     podStore.removePod(pod.metadata.name);
 
     console.log("删除pod信息", deletePod)

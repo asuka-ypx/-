@@ -176,16 +176,20 @@ const submitForm = async () => {
             return null;
         }).filter(pod => pod !== null);
 
-        console.log(selectedPods)
+        console.log(selectedPods[0])
 
         // 向服务器发送 POST 请求，提交任务
         const apiUrl = import.meta.env.VITE_APP_SERVER_URL; // Vite 的用法
         console.log("apiurl",apiUrl)
-        const responseStep1 = await axios.post(apiUrl+'/DDQN_schedule', selectedPods
+        const responseStep1 = await axios.post(apiUrl+'/DDQN_schedule', selectedPods[0]
             // function: form.function,
         );
+        progress1.value = 100;  // 设置为100%
+        indeterminate1.value = false;  // 取消不确定状态
+        status1.value = "success";  // 状态改为success
+        
         console.log("结果返回", responseStep1)
-
+        stepMessages.step3 = '调度成功'
         // stepMessages.step1 = responseStep1.data.message || '服务器已接收到调度请求';
         // console.log('调度请求成功：', responseStep1.data);
 

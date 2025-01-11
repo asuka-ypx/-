@@ -62,17 +62,39 @@ const requestParams = ref({
     }
 });
 
+setTimeout(async () => {
+    nodeStore.$reset();
+    const apiUrl = import.meta.env.VITE_APP_SERVER_URL; // Vite 的用法
+    const Nodes = await axios.get(apiUrl + "/nodes");
+    console.log("获取所有节点的信息", Nodes)
+    
+    // 获取 Pinia 中已存在的节点
+    const existingNodes = nodeStore.nodes;
+    // 将服务器返回的节点对象转换为数组
+    const allNodes = Object.values(Nodes.data.nodes);
+
+    console.log(allNodes)
+
+    // 将从服务器获取的节点添加到 Pinia 中，但只添加没有的节点
+    allNodes.forEach((newNode) => {
+        const exists = existingNodes.some((node) => node.name === newNode.name);
+        if (!exists) {
+            nodeStore.addNode(newNode);  // 如果节点不存在，则添加到 Pinia 中
+        }
+    });
+}, 1500)
+
 const addnode = async () => {
 
     const requestData = JSON.stringify(requestParams.value);
     console.log("发送的节点信息", requestData);
     const apiUrl = import.meta.env.VITE_APP_SERVER_URL; // Vite 的用法
-    const response = await axios.post(apiUrl+"/nodes", requestData);
+    const response = await axios.post(apiUrl + "/nodes", requestData);
     //URL为服务器地址 @app.route('/nodes', methods=['POST'])
     //结果返回为return response.json({'message': f"Node '{name}' added successfully."}, status=201)
     console.log("post后返回的response", response)
     //获取所有节点信息  @app.route('/nodes', methods=['GET'])
-    const Nodes = await axios.get(apiUrl+"/nodes");
+    const Nodes = await axios.get(apiUrl + "/nodes");
     console.log("获取所有节点的信息", Nodes)
 
     // 获取 Pinia 中已存在的节点
@@ -103,7 +125,7 @@ const handleDelete = (node: NodeData) => {
     }).then(async () => {
         nodeStore.removeNode(node.name);
         const apiUrl = import.meta.env.VITE_APP_SERVER_URL; // Vite 的用法
-        const deletenode = await axios.delete(apiUrl+`/nodes/${node.name}`);
+        const deletenode = await axios.delete(apiUrl + `/nodes/${node.name}`);
         console.log("删除节点的返回结果", deletenode);
         ElMessage({
             type: 'success',
